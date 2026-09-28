@@ -7,6 +7,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +27,8 @@ class MyApp extends StatelessWidget {
                 var result = await OpenMailAppPlus.openMailApp(
                   nativePickerTitle: 'Select email app to open',
                 );
+
+                if (!context.mounted) return;
 
                 // If no mail apps found, show error
                 if (!result.didOpen && !result.canOpen) {
@@ -62,6 +66,9 @@ class MyApp extends StatelessWidget {
                     await OpenMailAppPlus.composeNewEmailInMailApp(
                         nativePickerTitle: 'Select email app to compose',
                         emailContent: email);
+
+                if (!context.mounted) return;
+
                 if (!result.didOpen && !result.canOpen) {
                   showNoMailAppsDialog(context);
                 } else if (!result.didOpen && result.canOpen) {
@@ -79,6 +86,8 @@ class MyApp extends StatelessWidget {
               child: Text("Get Mail Apps"),
               onPressed: () async {
                 var apps = await OpenMailAppPlus.getMailApps();
+
+                if (!context.mounted) return;
 
                 if (apps.isEmpty) {
                   showNoMailAppsDialog(context);

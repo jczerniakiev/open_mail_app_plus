@@ -6,16 +6,16 @@ import 'package:platform/platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Launch Schemes for supported apps:
-const String _LAUNCH_SCHEME_APPLE_MAIL = 'message://';
-const String _LAUNCH_SCHEME_GMAIL = 'googlegmail://';
-const String _LAUNCH_SCHEME_DISPATCH = 'x-dispatch://';
-const String _LAUNCH_SCHEME_SPARK = 'readdle-spark://';
-const String _LAUNCH_SCHEME_AIRMAIL = 'airmail://';
-const String _LAUNCH_SCHEME_OUTLOOK = 'ms-outlook://';
-const String _LAUNCH_SCHEME_YAHOO = 'ymail://';
-const String _LAUNCH_SCHEME_FASTMAIL = 'fastmail://';
-const String _LAUNCH_SCHEME_SUPERHUMAN = 'superhuman://';
-const String _LAUNCH_SCHEME_PROTONMAIL = 'protonmail://';
+const String _launchSchemeAppleMail = 'message://';
+const String _launchSchemeGmail = 'googlegmail://';
+const String _launchSchemeDispatch = 'x-dispatch://';
+const String _launchSchemeSpark = 'readdle-spark://';
+const String _launchSchemeAirmail = 'airmail://';
+const String _launchSchemeOutlook = 'ms-outlook://';
+const String _launchSchemeYahoo = 'ymail://';
+const String _launchSchemeFastmail = 'fastmail://';
+const String _launchSchemeSuperhuman = 'superhuman://';
+const String _launchSchemeProtonmail = 'protonmail://';
 
 /// Provides ability to query device for installed email apps and open those
 /// apps
@@ -23,7 +23,7 @@ class OpenMailAppPlus {
   OpenMailAppPlus._();
 
   @visibleForTesting
-  static Platform platform = LocalPlatform();
+  static Platform platform = Platform.current;
 
   static bool get _isAndroid => platform.isAndroid;
 
@@ -34,72 +34,72 @@ class OpenMailAppPlus {
   static final List<MailApp> _supportedMailApps = [
     MailApp(
       name: 'Apple Mail',
-      iosLaunchScheme: _LAUNCH_SCHEME_APPLE_MAIL,
+      iosLaunchScheme: _launchSchemeAppleMail,
       composeData: ComposeData(
         base: 'mailto:',
       ),
     ),
     MailApp(
       name: 'Gmail',
-      iosLaunchScheme: _LAUNCH_SCHEME_GMAIL,
+      iosLaunchScheme: _launchSchemeGmail,
       composeData: ComposeData(
-        base: '$_LAUNCH_SCHEME_GMAIL/co',
+        base: '$_launchSchemeGmail/co',
       ),
     ),
     MailApp(
       name: 'Dispatch',
-      iosLaunchScheme: _LAUNCH_SCHEME_DISPATCH,
+      iosLaunchScheme: _launchSchemeDispatch,
       composeData: ComposeData(
-        base: '$_LAUNCH_SCHEME_DISPATCH/compose',
+        base: '$_launchSchemeDispatch/compose',
       ),
     ),
     MailApp(
       name: 'Spark',
-      iosLaunchScheme: _LAUNCH_SCHEME_SPARK,
+      iosLaunchScheme: _launchSchemeSpark,
       composeData: ComposeData(
-        base: '${_LAUNCH_SCHEME_SPARK}compose',
+        base: '${_launchSchemeSpark}compose',
         to: 'recipient',
       ),
     ),
     MailApp(
       name: 'Airmail',
-      iosLaunchScheme: _LAUNCH_SCHEME_AIRMAIL,
+      iosLaunchScheme: _launchSchemeAirmail,
       composeData: ComposeData(
-        base: '${_LAUNCH_SCHEME_AIRMAIL}compose',
+        base: '${_launchSchemeAirmail}compose',
         body: 'plainBody',
       ),
     ),
     MailApp(
       name: 'Outlook',
-      iosLaunchScheme: _LAUNCH_SCHEME_OUTLOOK,
+      iosLaunchScheme: _launchSchemeOutlook,
       composeData: ComposeData(
-        base: '${_LAUNCH_SCHEME_OUTLOOK}compose',
+        base: '${_launchSchemeOutlook}compose',
       ),
     ),
     MailApp(
       name: 'Yahoo',
-      iosLaunchScheme: _LAUNCH_SCHEME_YAHOO,
+      iosLaunchScheme: _launchSchemeYahoo,
       composeData: ComposeData(
-        base: '${_LAUNCH_SCHEME_YAHOO}mail/compose',
+        base: '${_launchSchemeYahoo}mail/compose',
       ),
     ),
     MailApp(
       name: 'Fastmail',
-      iosLaunchScheme: _LAUNCH_SCHEME_FASTMAIL,
+      iosLaunchScheme: _launchSchemeFastmail,
       composeData: ComposeData(
-        base: '${_LAUNCH_SCHEME_FASTMAIL}mail/compose',
+        base: '${_launchSchemeFastmail}mail/compose',
       ),
     ),
     MailApp(
       name: 'Superhuman',
-      iosLaunchScheme: _LAUNCH_SCHEME_SUPERHUMAN,
+      iosLaunchScheme: _launchSchemeSuperhuman,
       composeData: ComposeData(),
     ),
     MailApp(
       name: 'ProtonMail',
-      iosLaunchScheme: _LAUNCH_SCHEME_PROTONMAIL,
+      iosLaunchScheme: _launchSchemeProtonmail,
       composeData: ComposeData(
-        base: '${_LAUNCH_SCHEME_PROTONMAIL}mailto:',
+        base: '${_launchSchemeProtonmail}mailto:',
       ),
     ),
   ];
@@ -129,10 +129,7 @@ class OpenMailAppPlus {
     } else if (_isIOS) {
       final apps = await _getIosMailApps();
       if (apps.length == 1) {
-        final result = await launch(
-          apps.first.iosLaunchScheme,
-          forceSafariVC: false,
-        );
+        final result = await launchUrl(Uri.parse(apps.first.iosLaunchScheme));
         return OpenMailAppResult(didOpen: result);
       } else {
         return OpenMailAppResult(didOpen: false, options: apps);
@@ -170,10 +167,7 @@ class OpenMailAppPlus {
         String? launchScheme =
             installedApps.first.composeLaunchScheme(emailContent);
         if (launchScheme != null) {
-          result = await launch(
-            launchScheme,
-            forceSafariVC: false,
-          );
+          result = await launchUrl(Uri.parse(launchScheme));
         }
         return OpenMailAppResult(didOpen: result);
       } else {
@@ -209,10 +203,7 @@ class OpenMailAppPlus {
     } else if (_isIOS) {
       String? launchScheme = mailApp.composeLaunchScheme(emailContent);
       if (launchScheme != null) {
-        return await launch(
-          launchScheme,
-          forceSafariVC: false,
-        );
+        return await launchUrl(Uri.parse(launchScheme));
       }
 
       return false;
@@ -232,10 +223,7 @@ class OpenMailAppPlus {
           false;
       return result;
     } else if (_isIOS) {
-      return await launch(
-        mailApp.iosLaunchScheme,
-        forceSafariVC: false,
-      );
+      return await launchUrl(Uri.parse(mailApp.iosLaunchScheme));
     } else {
       throw Exception('Platform not supported');
     }
@@ -271,7 +259,7 @@ class OpenMailAppPlus {
   static Future<List<MailApp>> _getIosMailApps() async {
     var installedApps = <MailApp>[];
     for (var app in _supportedMailApps) {
-      if (await canLaunch(app.iosLaunchScheme) &&
+      if (await canLaunchUrl(Uri.parse(app.iosLaunchScheme)) &&
           !_filterList.contains(app.name.toLowerCase())) {
         installedApps.add(app);
       }
@@ -303,11 +291,11 @@ class MailAppPickerDialog extends StatelessWidget {
   final EmailContent? emailContent;
 
   const MailAppPickerDialog({
-    Key? key,
+    super.key,
     this.title = 'Choose Mail App',
     required this.mailApps,
     this.emailContent,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -461,7 +449,8 @@ class EmailContent {
       OpenMailAppPlus._isIOS ? Uri.encodeComponent(_subject) : _subject;
   final String _body;
 
-  String get body => OpenMailAppPlus._isIOS ? Uri.encodeComponent(_body) : _body;
+  String get body =>
+      OpenMailAppPlus._isIOS ? Uri.encodeComponent(_body) : _body;
 
   EmailContent({
     List<String>? to,
