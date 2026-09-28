@@ -11,13 +11,13 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
-  url_launcher: ^6.3.1
-  platform: ^3.1.6
+  url_launcher: ^6.3.2
+  platform: ^3.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 flutter:
 
   plugin:
